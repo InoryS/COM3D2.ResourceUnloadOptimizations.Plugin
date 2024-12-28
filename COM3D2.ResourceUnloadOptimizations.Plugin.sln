@@ -1,0 +1,15 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBA}") = "COM3D2.ResourceUnloadOptimizations.Plugin", "COM3D2.ResourceUnloadOptimizations.Plugin\COM3D2.ResourceUnloadOptimizations.Plugin.csproj", "{AE8E0866-6877-F78C-BDE7-5A791D3B9DCA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE8E0866-6877-F78C-BDE7-5A791D3B9DCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE8E0866-6877-F78C-BDE7-5A791D3B9DCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE8E0866-6877-F78C-BDE7-5A791D3B9DCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE8E0866-6877-F78C-BDE7-5A791D3B9DCA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

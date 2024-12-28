@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+    <AssemblyName>COM3D2.ResourceUnloadOptimizations.Plugin</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RestoreAdditionalProjectSources>
+<!--      https://api.nuget.org/v3/index.json;-->
+<!--      https://nuget.bepinex.dev/v3/index.json;-->
+<!--      https://nuget.samboy.dev/v3/index.json;-->
+      https://pkgs.dev.azure.com/bepinex/BepInEx/_packaging/BepInExLibs/nuget/v3/index.json;
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="MonoMod.RuntimeDetour" Version="21.12.13.1" />
+<!--    <PackageReference Include="HarmonyX" Version="2.13.0" />-->
+    <PackageReference Include="UnityEngine.Modules" Version="5.6.4" IncludeAssets="compile" />
+    <PackageReference Include="BepinEx.Core" Version="5.*" IncludeAssets="compile" />
+    <PackageReference Include="COM3D2.GameLibs" Version="2.39.0-r.0" />
+    
+    <Reference Include="COM3D2.DanceCameraMotion.Plugin">
+        <HintPath>..\lib\COM3D2.DanceCameraMotion.Plugin.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  
+</Project>
