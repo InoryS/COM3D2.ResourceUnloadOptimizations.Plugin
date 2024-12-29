@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace BepInEx
+namespace COM3D2.ResourceUnloadOptimizations.Plugin
 {
     /// <summary>
     /// Provides information about system memory status
