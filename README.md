@@ -4,11 +4,11 @@
 # COM3D2.ResourceUnloadOptimizations.Plugin
 This plugin is only for COM3D2.
 
-This plugin is a modified version of BepInEx.Utility https://github.com/BepInEx/BepInEx.Utility
+This plugin is a modified version of [BepInEx.ResourceUnloadOptimizations](https://github.com/BepInEx/BepInEx.Utility/tree/master/BepInEx.ResourceUnloadOptimizations)
 
 Released under GNU GENERAL PUBLIC LICENSE Version 3.
 
-Part of the code (monoPatcher) comes from https://github.com/silver1145/COM3D2.DCMMemoryOptimization and the repository code comes from [KK]MMDD (@Countd360).
+Some code (monoPatcher) comes from [COM3D2.DCMMemoryOptimization](https://github.com/silver1145/) which in turn comes from [KK]MMDD (@Countd360).
 
 Released under MIT.
 
@@ -143,8 +143,15 @@ The following are the core configuration items provided by this plugin, which ca
 
 
 
-
-
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 
 
@@ -158,11 +165,11 @@ The following are the core configuration items provided by this plugin, which ca
 # COM3D2.ResourceUnloadOptimizations.Plugin
 本插件仅适用于 COM3D2 使用。
 
-本插件是基于 BepInEx.Utility 的衍生修改版本 https://github.com/BepInEx/BepInEx.Utility
+本插件是基于 [BepInEx.ResourceUnloadOptimizations](https://github.com/BepInEx/BepInEx.Utility/tree/master/BepInEx.ResourceUnloadOptimizations) 的衍生修改版本
 
 已在 GNU GENERAL PUBLIC LICENSE Version 3 协议下发布。
 
-部分代码（monoPatcher） 来自 https://github.com/silver1145/COM3D2.DCMMemoryOptimization 而该仓库代码又来自 [KK]MMDD (@Countd360)。
+部分代码（monoPatcher） 来自 [COM3D2.DCMMemoryOptimization](https://github.com/silver1145/) 而该仓库的代码又来自 [KK]MMDD (@Countd360)。
 
 已在 MIT 协议下发布。
 
