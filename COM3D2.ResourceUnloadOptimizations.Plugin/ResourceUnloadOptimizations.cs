@@ -33,7 +33,7 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
 
         public static ConfigEntry<bool> FullGCOnSceneUnload { get; private set; }
         public static ConfigEntry<bool> GCAfterDance { get; private set; }
-        public static ConfigEntry<bool> DisableUnload { get; private set; }
+        public static ConfigEntry<long> MaxHeapSize { get; private set; }  // GC.GetTotalMemory return long
         public static ConfigEntry<bool> MaximizeMemoryUsage { get; private set; }
         public static ConfigEntry<int> PercentMemoryThreshold { get; private set; }
         public static ConfigEntry<float> PageFileFreeThreshold { get; private set; }
@@ -49,8 +49,10 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
         public static ConfigEntry<bool> EnablePeriodicGC { get; private set; }
         public static ConfigEntry<int> PeriodicGCInterval { get; private set; }
 
-        private static bool _monoGCInited = false;
+        public static ConfigEntry<bool> DisableUnload { get; private set; }
 
+
+        private static bool _monoGCInited = false;
         private static ResourceUnloadOptimizations Instance { get; set; }
 
         private Coroutine _memoryCheckCoroutine;
@@ -65,7 +67,7 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
 
             FullGCOnSceneUnload = Config.Bind("Garbage Collection", "Enable Full GC OnScene Unload", true, "If true, will run a full GC after a scene is unloaded. It will increase loading times, but it can save memory for the next scene.");
             GCAfterDance = Config.Bind("Garbage Collection", "GC After Dance", true, "If true, will run a full GC after a dance finished, include DCM dance");
-
+            MaxHeapSize =  Config.Bind("Garbage Collection", "Max Heap Size", 20000L * 1024L * 1024L, "The maximum amount of heap memory the game can use, there seems to be a hardcoded limit, the game will crash with a \"Too many heap sections\" message when heap size exceeds around 23500 MB. (default value mean 20000 MB, exceeding this value will trigger a full GC)");
 
             MaximizeMemoryUsage = Config.Bind("Unload Throttling", "Maximize Memory Usage", true, "If true, allows the game to use as much memory as possible, up to the limit set below, to reduce random stuttering caused by garbage collection.");
             PercentMemoryThreshold = Config.Bind("Unload Throttling", "Memory Threshold", 75, "Allow games and other programs to occupy up to x% of physical memory without garbage collecting the game (default value mean: 75%).");
@@ -112,6 +114,7 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
         {
             StopAllCoroutines();
         }
+
 
         /// <summary>
         /// Use MonoMod.RuntimeDetour + Harmony to replace and intercept Resources.UnloadUnusedAssets and GC.Collect
@@ -244,8 +247,9 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
                 return false;
             }
 
-            // Clean up more aggressively during loading, less aggressively during gameplay
-            var pageFileFree = mem.ullAvailPageFile / (float)mem.ullTotalPageFile;
+
+            var pageFileFree = mem.ullAvailPageFile / (float)mem.ullTotalPageFile; // Clean up more aggressively during loading, less aggressively during gameplay
+            var heapSize = GC.GetTotalMemory(false);  // there seems to be a hardcoded limit, the game will crash with a "Too many heap sections" message when heap size exceeds around 23500 MB.
             bool plentyOfMemory;
 
             if (DanceMaximizeMemoryUsageFlag)
@@ -255,7 +259,9 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
 #endif
                 plentyOfMemory = mem.dwMemoryLoad < DancePercentMemoryThreshold.Value // < 90% by default
                                      && pageFileFree >  DancePageFileFreeThreshold.Value  // page file free %, default 10%
-                                     && mem.ullAvailPageFile >  DanceMinAvailPageFileBytes.Value; // at least 2GB of page file free
+                                     && mem.ullAvailPageFile >  DanceMinAvailPageFileBytes.Value // at least 2GB of page file free
+                                     && heapSize < MaxHeapSize.Value; // max heap size, default 20000MB
+
             }
             else
             {
@@ -264,18 +270,20 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
 #endif
                 plentyOfMemory = mem.dwMemoryLoad < PercentMemoryThreshold.Value // < 75% by default
                                      && pageFileFree > PageFileFreeThreshold.Value  // page file free %, default 40%
-                                     && mem.ullAvailPageFile > MinAvailPageFileBytes.Value; // at least 2GB of page file free
+                                     && mem.ullAvailPageFile > MinAvailPageFileBytes.Value // at least 2GB of page file free
+                                     && heapSize < MaxHeapSize.Value; // max heap size, default 20000MB
             }
 
             if (!plentyOfMemory){
                 Logger.LogDebug("GC called and cleaning, because the memory usage reaches the threshold.");
-                Logger.LogDebug($"Physical RAM Load: {mem.dwMemoryLoad}% (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePercentMemoryThreshold.Value : PercentMemoryThreshold.Value)}%), PageFile Free: {pageFileFree:P} (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePageFileFreeThreshold.Value : PageFileFreeThreshold.Value):P}), Available PageFile: {mem.ullAvailPageFile / 1024 / 1024}MB (Threshold: {(DanceMaximizeMemoryUsageFlag ? DanceMinAvailPageFileBytes.Value : MinAvailPageFileBytes.Value) / 1024 / 1024}MB)");
+                Logger.LogDebug($"Physical RAM Load: {mem.dwMemoryLoad}% (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePercentMemoryThreshold.Value : PercentMemoryThreshold.Value)}%), PageFile Free: {pageFileFree:P} (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePageFileFreeThreshold.Value : PageFileFreeThreshold.Value):P}), Available PageFile: {mem.ullAvailPageFile / 1024 / 1024}MB (Threshold: {(DanceMaximizeMemoryUsageFlag ? DanceMinAvailPageFileBytes.Value : MinAvailPageFileBytes.Value) / 1024 / 1024}MB), Heap Size: {heapSize / 1024.0 / 1024.0:P}MB (Threshold: {MaxHeapSize.Value / 1024.0 / 1024.0:P}MB)");
+
                 return false;
             }
 
 
             Logger.LogDebug("GC called, but skipping cleanup because of low memory load.");
-            Logger.LogDebug($"Physical RAM Load: {mem.dwMemoryLoad}% (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePercentMemoryThreshold.Value : PercentMemoryThreshold.Value)}%), PageFile Free: {pageFileFree:P} (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePageFileFreeThreshold.Value : PageFileFreeThreshold.Value):P}), Available PageFile: {mem.ullAvailPageFile / 1024 / 1024}MB (Threshold: {(DanceMaximizeMemoryUsageFlag ? DanceMinAvailPageFileBytes.Value : MinAvailPageFileBytes.Value) / 1024 / 1024}MB)");
+            Logger.LogDebug($"Physical RAM Load: {mem.dwMemoryLoad}% (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePercentMemoryThreshold.Value : PercentMemoryThreshold.Value)}%), PageFile Free: {pageFileFree:P} (Threshold: {(DanceMaximizeMemoryUsageFlag ? DancePageFileFreeThreshold.Value : PageFileFreeThreshold.Value):P}), Available PageFile: {mem.ullAvailPageFile / 1024 / 1024}MB (Threshold: {(DanceMaximizeMemoryUsageFlag ? DanceMinAvailPageFileBytes.Value : MinAvailPageFileBytes.Value) / 1024 / 1024}MB), Heap Size: {heapSize / 1024.0 / 1024.0:P}MB (Threshold: {MaxHeapSize.Value / 1024.0 / 1024.0:P}MB)");
             return true;
         }
 
@@ -286,11 +294,13 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
             {
                 Logger.LogDebug("We are exit dance scene, running a full GC...");
                 RunFullGarbageCollect(true);
+                RunFullGarbageCollect(true);
                 return;
             }
             if (FullGCOnSceneUnload.Value)
             {
                 Logger.LogDebug($"scene {scene.name} unloading, running a full GC...");
+                RunFullGarbageCollect(true);
                 RunFullGarbageCollect(true);
             }
         }
@@ -378,6 +388,7 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
                     Logger.LogInfo("Memory usage exceeds threshold, triggering garbage collection...");
                     EnableMonoGC();
                     RunFullGarbageCollect(true);
+                    DisableMonoGC(); // Disable again after cleaning
                 }
                 else
                 {
