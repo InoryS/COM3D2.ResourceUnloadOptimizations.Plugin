@@ -14,9 +14,9 @@ Released under MIT.
 
 ### Compatibility
 
-Tested with COM3D2 2.40.0
+Tested with COM3D2 2.40.0, COM3D2 2.41.0
 
-Not tested with COM3D2.5, but should work
+Not tested with COM3D2.5, Since 3.41.0 updated the unity engine, it will most likely not work.
 
 ### Why fork
 Since we wanted to add some specific memory management logic in the COM3D2 environment, we forked the official library and made a lot of customization and hooks to meet the needs of using it in the specific game scenario of COM3D2.
@@ -184,9 +184,9 @@ The following are the core configuration items provided by this plugin, which ca
 
 ### 兼容性
 
-已在 COM3D2 2.40.0 中测试通过
+已在 COM3D2 2.40.0, COM3D2 2.41.0 中测试通过
 
-未测试 COM3D2.5，但应该可以工作
+未测试 COM3D2.5，由于 3.41.0 更新了unity引擎，它很可能不工作
 
 ### 为什么分叉
 由于想在 COM3D2 环境下加入一些特定的内存管理逻辑，因此对官方库进行了 Fork 并进行了大量定制和 Hook，以满足在 COM3D2 这一特定游戏场景下使用的需求。
