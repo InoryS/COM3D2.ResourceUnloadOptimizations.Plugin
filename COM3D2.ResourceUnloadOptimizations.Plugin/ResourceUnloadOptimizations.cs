@@ -32,7 +32,9 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
         private float _waitTime;
 
         public static ConfigEntry<bool> FullGCOnSceneUnload { get; private set; }
+        public static ConfigEntry<bool> UnloadAssetsOnSceneUnload { get; private set; }
         public static ConfigEntry<bool> GCAfterDance { get; private set; }
+        public static ConfigEntry<bool> UnloadAssetsAfterDance { get; private set; }
         public static ConfigEntry<long> MaxHeapSize { get; private set; }  // GC.GetTotalMemory return long
         public static ConfigEntry<bool> MaximizeMemoryUsage { get; private set; }
         public static ConfigEntry<int> PercentMemoryThreshold { get; private set; }
@@ -66,7 +68,9 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
             _harmony = new Harmony(GUID);
 
             FullGCOnSceneUnload = Config.Bind("Garbage Collection", "Enable Full GC OnScene Unload", true, "If true, will run a full GC after a scene is unloaded. It will increase loading times, but it can save memory for the next scene.");
+            UnloadAssetsOnSceneUnload = Config.Bind("Garbage Collection", "Enable Unload Assets OnScene Unload", false, "If true, will run a unload unused assets after a scene is unloaded. It will increase loading times, but it can save memory for the next scene.");
             GCAfterDance = Config.Bind("Garbage Collection", "GC After Dance", true, "If true, will run a full GC after a dance finished, include DCM dance");
+            UnloadAssetsAfterDance = Config.Bind("Garbage Collection", " Unload Assets After Dance", false, "If true, will run a unload unused assets after a dance finished, include DCM dance");
             MaxHeapSize =  Config.Bind("Garbage Collection", "Max Heap Size", 20000L * 1024L * 1024L, "The maximum amount of heap memory the game can use, there seems to be a hardcoded limit, the game will crash with a \"Too many heap sections\" message when heap size exceeds around 23500 MB. (default value mean 20000 MB, exceeding this value will trigger a full GC)");
 
             MaximizeMemoryUsage = Config.Bind("Unload Throttling", "Maximize Memory Usage", true, "If true, allows the game to use as much memory as possible, up to the limit set below, to reduce random stuttering caused by garbage collection.");
@@ -132,7 +136,6 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
             detour.Apply();
 
             _harmony.PatchAll(typeof(GCHooks));
-            //harmony.PatchAll(typeof(GameMainUnloadSceneHooks));
         }
 
         /// <summary>
@@ -182,13 +185,16 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
         /// <summary>
         /// Trigger resource unloading, using the original trampoline call
         /// </summary>
-        private static AsyncOperation RunUnloadAssets()
+        private static AsyncOperation RunUnloadAssets(bool ignorePlentyOfMemory)
         {
             // Only allow a single unload operation to run at one time
-            if (_currentOperation == null || _currentOperation.isDone && !PlentyOfMemory(false))
+            if (_currentOperation == null || _currentOperation.isDone)
             {
-                Logger.LogDebug("Starting unused asset cleanup");
-                _currentOperation = _originalUnload();
+                if (!ignorePlentyOfMemory && PlentyOfMemory(false))
+                {
+                    Logger.LogDebug("Starting unused asset cleanup");
+                    _currentOperation = _originalUnload();
+                }
             }
             return _currentOperation;
         }
@@ -290,18 +296,41 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
 
         public void OnSceneUnloaded(Scene scene)
         {
+            void PerformGarbageCollection()
+            {
+                RunFullGarbageCollect(true);
+            }
+
+            void PerformUnloadAssetsWithGC()
+            {
+                RunUnloadAssets(true);
+                RunFullGarbageCollect(true);
+            }
+
             if (GCAfterDance.Value && scene.name.ToLower().Contains("dance"))
             {
-                Logger.LogDebug("We are exit dance scene, running a full GC...");
-                RunFullGarbageCollect(true);
-                RunFullGarbageCollect(true);
+                Logger.LogDebug($"Exiting {scene.name} dance scene...");
+                if (UnloadAssetsAfterDance.Value)
+                {
+                    PerformUnloadAssetsWithGC();
+                }
+                else
+                {
+                    PerformGarbageCollection();
+                }
                 return;
             }
+
             if (FullGCOnSceneUnload.Value)
             {
-                Logger.LogDebug($"scene {scene.name} unloading, running a full GC...");
-                RunFullGarbageCollect(true);
-                RunFullGarbageCollect(true);
+                Logger.LogDebug($"Scene {scene.name} unloading, performing garbage collection...");
+                PerformGarbageCollection();
+            }
+
+            if (UnloadAssetsOnSceneUnload.Value)
+            {
+                Logger.LogDebug($"Scene {scene.name} unloading, performing asset unloading with garbage collection...");
+                PerformUnloadAssetsWithGC();
             }
         }
 
@@ -416,9 +445,13 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
             public static AsyncOperation UnloadUnusedAssetsHook()
             {
                 if (DisableUnload.Value)
+                {
                     return null;
+                }
                 else
-                    return RunUnloadAssets();
+                {
+                    return RunUnloadAssets(false);
+                }
             }
         }
 
@@ -443,6 +476,10 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
                 Logger.LogDebug("We are exit DCM dancing, end stopping GC~");
                 EnableMonoGC();
                 DanceMaximizeMemoryUsageFlag = false;
+                if (UnloadAssetsAfterDance.Value)
+                {
+                    RunUnloadAssets(true);
+                }
                 if (GCAfterDance.Value)
                 {
                     Logger.LogDebug("We are exit DCM dancing, running a full GC...");
