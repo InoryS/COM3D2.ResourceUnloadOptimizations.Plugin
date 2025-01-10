@@ -18,6 +18,8 @@ Tested with COM3D2 2.40.0, COM3D2 2.41.0
 
 Not tested with COM3D2.5, Since 3.41.0 updated the unity engine, it will most likely not work.
 
+But if you use 3.41.0 you probably don't need it, because Unity 2022 has incremental garbage collection.
+
 ### Why fork
 Since we wanted to add some specific memory management logic in the COM3D2 environment, we forked the official library and made a lot of customization and hooks to meet the needs of using it in the specific game scenario of COM3D2.
 
@@ -186,7 +188,9 @@ The following are the core configuration items provided by this plugin, which ca
 
 已在 COM3D2 2.40.0, COM3D2 2.41.0 中测试通过
 
-未测试 COM3D2.5，由于 3.41.0 更新了unity引擎，它很可能不工作
+未测试 COM3D2.5，由于 3.41.0 更新了 unity 引擎，它很可能不工作
+
+但是如果你使用 3.41.0 你大概也不需要它，因为 unity 2022 拥有增量式垃圾回收
 
 ### 为什么分叉
 由于想在 COM3D2 环境下加入一些特定的内存管理逻辑，因此对官方库进行了 Fork 并进行了大量定制和 Hook，以满足在 COM3D2 这一特定游戏场景下使用的需求。
