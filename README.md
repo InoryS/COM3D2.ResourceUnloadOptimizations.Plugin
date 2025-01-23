@@ -146,7 +146,6 @@ The following are the core configuration items provided by this plugin, which ca
   - This plugin is not magic, it can only delay GC as much as possible and avoid lags by not performing GC during dancing, but it cannot really solve the lags caused by GC. And the premise of doing this is that you have more memory.
   - The plugin may not be compatible with all COM3D2 versions. If you encounter errors or conflicts with other plugins, please pay attention to whether there are plugins with the same functions or Hook conflicts (such as `BepInEx.ResourceUnloadOptimizations.dll` and `COM3D2.DCMMemoryOptimization.dll` and `COM3D2.Placebo.Plugin.dll`, etc.), try to uninstall or disable them before testing this plugin.
   - Due to the low-level memory management Hook, if there are unknown problems, the game may crash or memory leak, please use it with caution and make backups.
-  - In some extreme scenarios, disabling GC will cause serious memory usage. It is recommended to set a reasonable threshold or enable periodic GC to avoid risks.
   - If you open the IMGUI window (the transparent black window of the plugin) with GC disabled (while dancing), you will see the heap size increase very quickly. You may want to install [OptimizeIMGUI](https://github.com/BepInEx/BepInEx.Utility) to mitigate this slightly. However, try not to open the IMGUI window with GC disabled. (One set of data is that when I open the DCM window during the 3-person pole dance, my final heap size will reach 18G, but if I don't open any IMGUI window, then I will only reach 3.6G)
 
 
@@ -328,5 +327,4 @@ The following are the core configuration items provided by this plugin, which ca
  - 这个插件不是魔法，它只能尽量延后 GC，和在舞蹈时不进行 GC 来避免卡顿，而不能真正解决 GC 带来的卡顿。而且这样做的前提是你有较多的内存。
  - 插件不一定对所有 COM3D2 版本兼容，若遇到报错或与其他插件产生冲突，请留意是否有相同功能或 Hook 冲突的插件（如  `BepInEx.ResourceUnloadOptimizations.dll` 和 `COM3D2.DCMMemoryOptimization.dll` 和 `COM3D2.Placebo.Plugin.dll` 等），尝试卸载或将其禁用后再测试本插件。
  - 由于进行了较底层的内存管理 Hook，如有未知问题可能导致游戏崩溃或内存泄漏，请谨慎使用并做好备份。
- - 在某些极端场景下，禁用 GC 会产生严重的内存占用，建议合理设置阈值或启用定期 GC 来规避风险。
  - 如果你在禁用GC（跳舞时）的情况下打开 IMGUI 窗口（插件的透明黑色窗口），那么你会发现堆大小快速提升。你也许想安装 [OptimizeIMGUI](https://github.com/BepInEx/BepInEx.Utility) 来轻微缓解此情况。尽管如此，请尽量不要在禁用 GC 时打开 IMGUI 窗口。（一组数据是当我在 3 人钢管舞过程中打开 DCM 窗口时，我最终的堆大小将达到 18G，但如果我不打开任何 IMGUI 窗口，那么我只会达到 3.6G）
