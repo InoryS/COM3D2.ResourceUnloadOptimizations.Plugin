@@ -86,7 +86,7 @@ The following are the core configuration items provided by this plugin, which ca
     - Effect: Perform a full garbage collection after the dance or DCM dance ends. If you frequently exit the dance scene or the memory is tight, it is recommended to turn it on.
   - `Max Heap Size`
     - Default value: 20000 MB
-    - Effect: The maximum amount of heap memory the game can use, there seems to be a hardcoded limit, the game will crash with a "Too many heap sections" message when heap size exceeds around 23500 MB. exceeding this value will trigger a full GC.
+    - Effect: The maximum amount of heap memory the game can use, there seems to be a hardcoded limit, the game will crash with a "Too many heap sections" message when heap size exceeds around 23500 MB. exceeding this value will trigger a full GC. So don't touch this.
 2. **Unload Throttling**
   - `Maximize Memory Usage`
     - Default value: true
@@ -266,7 +266,7 @@ The following are the core configuration items provided by this plugin, which ca
    - 作用：在舞蹈或 DCM 舞蹈结束后执行一次完整的垃圾回收。若频繁退出舞蹈场景或内存比较紧张时，建议开启。
  - `Max Heap Size`
    - 默认值：20000 MB
-   - 效果：游戏可以使用的最大堆内存量，似乎有一个硬编码限制，当堆大小超过 23500 MB 左右时，游戏将崩溃并显示 “Too many heap sections”。超过此值将触发一次完整的垃圾回收。
+   - 效果：游戏可以使用的最大堆内存量，似乎有一个硬编码限制，当堆大小超过 23500 MB 左右时，游戏将崩溃并显示 “Too many heap sections”。超过此值将触发一次完整的垃圾回收。所以不要动这个。
 2. **Unload Throttling**
  - `Maximize Memory Usage`
    - 默认值：true
