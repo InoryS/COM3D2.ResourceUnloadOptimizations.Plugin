@@ -23,6 +23,13 @@ But if you use 3.41.0 you probably don't need it, because Unity 2022 has increme
 ### Why fork
 Since we wanted to add some specific memory management logic in the COM3D2 environment, we forked the official library and made a lot of customization and hooks to meet the needs of using it in the specific game scenario of COM3D2.
 
+### In short
+ - This plugin does not reduce your memory usage, instead it lets the game use as much memory as possible.
+ - If you don't have enough memory, it may have the opposite effect (recommended 24G+)
+ - In addition it also completely disables GC during dances (official and DanceCameraMotion) to avoid GC-induced stuttering
+ - Everything is configurable, but I think the defaults are good
+ - Don't touch the Max Heap Size option
+
 ### Function
 This plugin aims to optimize the two "resource cleanup/garbage collection" operations GC.Collect() and Resources.UnloadUnusedAssets() that are frequently called in the game:
 
@@ -194,6 +201,13 @@ The following are the core configuration items provided by this plugin, which ca
 
 ### 为什么分叉
 由于想在 COM3D2 环境下加入一些特定的内存管理逻辑，因此对官方库进行了 Fork 并进行了大量定制和 Hook，以满足在 COM3D2 这一特定游戏场景下使用的需求。
+
+### 简而言之
+ - 这个插件不会降低你的内存使用，相反它让游戏使用尽可能多的内存。
+ - 如果你没有足够的内存，它可能会起反效果（推荐 24G+）
+ - 此外它还在舞蹈时（官方和 DanceCameraMotion）时完全禁止 GC，来避免因为 GC 导致的顿卡
+ - 一切都是可以配置的，但我认为默认就很好
+ - 不要动Max Heap Size选项
 
 ### 功能
 本插件旨在对游戏中频繁调用的 GC.Collect() 和 Resources.UnloadUnusedAssets() 这两大“资源清理/垃圾回收”操作进行优化：
