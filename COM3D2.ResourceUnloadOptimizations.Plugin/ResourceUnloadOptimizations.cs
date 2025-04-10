@@ -21,7 +21,7 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
     {
         public const string GUID = "COM3D2.ResourceUnloadOptimizations.Plugin.InoryS";
         public const string PluginName = "COM3D2.ResourceUnloadOptimizations.Plugin";
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
 
         private static new ManualLogSource Logger;
 
@@ -70,7 +70,7 @@ namespace COM3D2.ResourceUnloadOptimizations.Plugin
             FullGCOnSceneUnload = Config.Bind("Garbage Collection", "Enable Full GC OnScene Unload", true, "If true, will run a full GC after a scene is unloaded. It will increase loading times, but it can save memory for the next scene.");
             UnloadAssetsOnSceneUnload = Config.Bind("Garbage Collection", "Enable Unload Assets OnScene Unload", false, "If true, will run a unload unused assets after a scene is unloaded. It will increase loading times, but it can save memory for the next scene.");
             GCAfterDance = Config.Bind("Garbage Collection", "GC After Dance", true, "If true, will run a full GC after a dance finished, include DCM dance");
-            UnloadAssetsAfterDance = Config.Bind("Garbage Collection", " Unload Assets After Dance", false, "If true, will run a unload unused assets after a dance finished, include DCM dance");
+            UnloadAssetsAfterDance = Config.Bind("Garbage Collection", "Unload Assets After Dance", false, "If true, will run a unload unused assets after a dance finished, include DCM dance");
             MaxHeapSize =  Config.Bind("Garbage Collection", "Max Heap Size", 20000L * 1024L * 1024L, "The maximum amount of heap memory the game can use, there seems to be a hardcoded limit, the game will crash with a \"Too many heap sections\" message when heap size exceeds around 23500 MB. (default value mean 20000 MB, exceeding this value will trigger a full GC)");
 
             MaximizeMemoryUsage = Config.Bind("Unload Throttling", "Maximize Memory Usage", true, "If true, allows the game to use as much memory as possible, up to the limit set below, to reduce random stuttering caused by garbage collection.");
